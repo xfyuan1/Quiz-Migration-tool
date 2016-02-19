@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<head>
+	<h1> <center> </center>Quiz Migration Tool</center></h1>
+<script src="js/jquery-1.10.2.js"></script>
+<script>
+$(document).ready(function(){
+	$("#transfer").click(function(){
+		s1 = $("#t1").val()
+		linesArray = s1.split("\n")
+		rs = ""
+		log = ""
+		for (var i = 0; i < linesArray.length; i++) {
+			line = linesArray[i]
+			oldStr = line
+			line = line.replace(new RegExp("<b>", "gm"), "<strong>")
+			line = line.replace(new RegExp("</b>", "gm"), "</strong>")
+			line = line.replace(new RegExp("<i>", "gm"), "<em>")
+			line = line.replace(new RegExp("</i>", "gm"), "</em>")
+			line = line.replace(new RegExp("<span>", "gm"), "<p>")
+			line = line.replace(new RegExp("</span>", "gm"), "</p>")
+            line = line.replace(new RegExp("<font[^>]*>","gm"),"")
+            line = line.replace(new RegExp("<table[^>]*>","gm"),"")
+            line = line.replace(new RegExp("<tr[^>]*>","gm"),"")
+            line = line.replace(new RegExp("<td[^>]*>","gm"),"")
+            line = line.replace(new RegExp("<span[^>]*>","gm"),"")
+            line = line.replace(new RegExp("<div[^>]*>","gm"),"")
+            line = line.replace(new RegExp("style=[^>]*","gm"),"")
+            line = line.replace(new RegExp("<code>","gm"),"$$$\\color{red}{\\verb|...|}$$$")
+            line = line.replace(new RegExp("</code>","gm"),"|}$$$")
+            line = line.replace(new RegExp("<rescale_score>(.*)</rescale_score>","gm"),"<rescale_score>1</rescale_score>")
+            line = line.replace(new RegExp("(<pre>)|(</pre>)|(<center>)|(</center>)|(<u>)|(</u>)|(</td>)|(</tr>)|</table>|<tt>|</tt>|<hr>|</hr>|</font>|<tbody>|<blockquote>|</blockquote>", "gm"), "")
+                    var re = new RegExp("selected_score=\"([^\"]*)\"", "gm")
+                    var re_rs = null
+                    var to_replace_str = line
+                    while ((re_rs = re.exec(line)) != null) {
+                        console.log(re_rs)
+                        var s_v = re_rs[1]
+                        var v = parseFloat(s_v)
+                        //console.log(v)
+                        if (v == 1 || v == 0) {
+                            //stay as it is                          
+                        } else {
+                            to_replace_str = to_replace_str.replace("selected_score=\"" + s_v + "\"", "selected_score=\"1\"")
+                        }
+                    }
+                    line = to_replace_str
+                    rs += line + "\n"
+                    if (oldStr != line) log += "line " + (i + 1) + ": " + oldStr + " -----> " + line + "\n"
+                }
+                $("#t2").val(rs)
+                if (log != "") $("#t3").text(log)
+            })
+        })
+    </script>
+
+</head>
+
+
+<textarea id="t1" cols=80 rows=30
+          placeholder="Old XML Script">
+</textarea>
+<textarea id="t2" cols=80 rows=30
+          placeholder="New XML Script">
+</textarea>            
+
+
+<div>
+<button type="button" id="transfer">transfer</button>
+</div>
+
+
+<h2>Logs</h2>
+<textarea id="t3" disabled="disabled" cols=80 rows=10>
+</textarea>
+
+</html>
